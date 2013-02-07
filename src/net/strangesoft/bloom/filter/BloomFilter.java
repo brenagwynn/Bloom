@@ -1,5 +1,9 @@
 package net.strangesoft.bloom.filter;
 
+/**
+An interface which describes the Bloom filter
+@see net.strangesoft.bloom.filter.FullBloomFilter
+ */
 public interface BloomFilter<T> {
 	/**
 	 * Adds an element to the filter

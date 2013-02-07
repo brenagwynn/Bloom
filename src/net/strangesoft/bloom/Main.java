@@ -1,10 +1,11 @@
 package net.strangesoft.bloom;
 
 import net.strangesoft.bloom.filter.BloomFilter;
+import net.strangesoft.bloom.hash.murmur2.Murmur2Factory;
 import net.strangesoft.bloom.profiling.Profilable;
 import net.strangesoft.bloom.profiling.ProfilableArrayList;
+import net.strangesoft.bloom.profiling.ProfilableFullBloomFilter;
 import net.strangesoft.bloom.profiling.ProfilableHashMap;
-import net.strangesoft.bloom.profiling.ProfilableMurBloomFilter;
 
 public class Main {
 
@@ -48,8 +49,8 @@ public class Main {
 		return;
 	}
 
-	public static void main(String[] args) {
-		ProfilableMurBloomFilter<String> f = new ProfilableMurBloomFilter<String>(5, 80000000);		
+	public static void main(String[] args) {				
+		ProfilableFullBloomFilter<String> ff = new ProfilableFullBloomFilter<String>(2560100, 1e-6, new Murmur2Factory());
 		long cnt = 0;
 		StringBuilder sb = new StringBuilder(4);
 		int m = 40;
@@ -68,10 +69,10 @@ public class Main {
 						sb.setCharAt(3, (char) ("A".codePointAt(0) + l));
 						String s = sb.toString();
 						cnt++;
-						f.put(s);
+						ff.put(s);
 					}
 		long estimatedTime = (System.nanoTime() - startTime) / 1000l / 1000l;
-		System.out.println("Bloom filter fill: " + estimatedTime + " ms");
+		System.out.println("Full bloom filter fill: " + estimatedTime + " ms");
 
 		cnt = 0;
 		startTime = System.nanoTime();
@@ -110,7 +111,7 @@ public class Main {
 		System.out.println("Generated " + cnt + " strings");
 		System.out.println("Running tests...");
 
-		doProfile(f, 1000, 40, "Bloom");
+		doProfile(ff, 100000, 40, "Full Bloom");
 		doProfile(al, 1000, 40, "ArrayList");
 		doProfile(hm, 1000, 40, "HashMap");
 
