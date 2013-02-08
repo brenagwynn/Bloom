@@ -9,6 +9,13 @@ import net.strangesoft.bloom.profiling.ProfilableHashMap;
 
 public class Main {
 
+	private static double round(double num, int cnt) {
+		double result = num * Math.pow(10, cnt);
+		result = Math.round(result);
+		result = result / Math.pow(10, cnt);
+		return result;
+	}
+
 	@SuppressWarnings({ "rawtypes" })
 	private static void doProfile(Profilable c, int tries, int ssize,
 			String name) {
@@ -37,20 +44,26 @@ public class Main {
 			if (i % (tries / 10) == 0)
 				System.out.print(".");
 		}
-		long estimatedTime = (System.nanoTime() - startTime) / 1000l / 1000l;
-		System.out.print(" " + estimatedTime + " ms");
+		long estimatedTime_us = (System.nanoTime() - startTime) / 1000l;
+		long estimatedTime_ms = estimatedTime_us / 1000l;
+		System.out.print(" " + estimatedTime_ms + " ms");
 		if (c instanceof BloomFilter)
 			System.out.println(", filter quality: "
 					+ ((BloomFilter) c).getQuality());
 		else
 			System.out.println("");
 		System.out.println("Positives: " + t);
+		System.out.println("Search speed: "
+				+ round(1.0 * tries / estimatedTime_ms, 3) + " searches per ms");
+		System.out.println("Search tempo: "
+				+ round(1.0 * estimatedTime_us / tries, 3) + " μs per search");
 
 		return;
 	}
 
-	public static void main(String[] args) {				
-		ProfilableFullBloomFilter<String> ff = new ProfilableFullBloomFilter<String>(2560100, 1e-6, new Murmur2Factory());
+	public static void main(String[] args) {
+		ProfilableFullBloomFilter<String> ff = new ProfilableFullBloomFilter<String>(
+				2560100, 1e-6, new Murmur2Factory());
 		long cnt = 0;
 		StringBuilder sb = new StringBuilder(4);
 		int m = 40;

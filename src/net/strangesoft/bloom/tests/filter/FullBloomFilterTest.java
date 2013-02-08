@@ -14,7 +14,7 @@ public class FullBloomFilterTest {
 	private static FullBloomFilter<String> gp;
 	private static FullBloomFilter<String> sgp;
 	private static FullBloomFilter<String> gpp;
-	
+
 	private static final IntHashFunctionFactory hf = new Murmur2Factory();
 
 	@BeforeClass
@@ -34,12 +34,12 @@ public class FullBloomFilterTest {
 						sb.setCharAt(1, (char) ("A".codePointAt(0) + j));
 						sb.setCharAt(2, (char) ("A".codePointAt(0) + k));
 						sb.setCharAt(3, (char) ("A".codePointAt(0) + l));
-						String s = sb.toString();						
+						String s = sb.toString();
 						gp.put(s);
 						sgp.put(s);
 						gpp.put(s);
 					}
-				
+
 	}
 
 	@Test
@@ -62,14 +62,14 @@ public class FullBloomFilterTest {
 
 		if (gp.getSize() != 10000000)
 			fail("Size is " + gp.getSize() + ", should be 1");
-		
+
 		if (gp.getBitSize() != 80000000)
 			fail("Bit size is " + gp.getBitSize() + ", should be 80000000");
 	}
 
 	@Test
 	public void testCheckExists() {
-		
+
 		StringBuilder sb = new StringBuilder(4);
 		int m = 40;
 		sb.setLength(4);
@@ -82,19 +82,20 @@ public class FullBloomFilterTest {
 						sb.setCharAt(1, (char) ("A".codePointAt(0) + j));
 						sb.setCharAt(2, (char) ("A".codePointAt(0) + k));
 						sb.setCharAt(3, (char) ("A".codePointAt(0) + l));
-						String s = sb.toString();						
+						String s = sb.toString();
 						if (!gp.checkExists(s))
 							fail(s + " should be in filter");
 					}
-				
+
 		if (gp.checkExists("~!@#"))
 			fail("~!@# should NOT be in filter");
-		
-		gp.put("~!@#");		
+
+		gp.put("~!@#");
 		if (!gp.checkExists("~!@#"))
-			fail("~!@# should now be in filter");		
-		
-		// the following 2 tests MIGHT (but usually should NOT) fail! This is probability theory, baby...
+			fail("~!@# should now be in filter");
+
+		// the following 2 tests MIGHT (but usually should NOT) fail! This is
+		// probability theory, baby...
 		boolean result = false;
 		for (int i = 0; i < 5; i++)
 			for (int j = 0; j < 5; j++)
@@ -104,12 +105,12 @@ public class FullBloomFilterTest {
 						sb.setCharAt(1, (char) ("ß".codePointAt(0) + j));
 						sb.setCharAt(2, (char) ("ß".codePointAt(0) + k));
 						sb.setCharAt(3, (char) ("ß".codePointAt(0) + l));
-						String s = sb.toString();						
-						result |= sgp.checkExists(s);						
-					}				
-		if (!result) 
+						String s = sb.toString();
+						result |= sgp.checkExists(s);
+					}
+		if (!result)
 			fail("There should be some false positives in bad quality filter. But not necessary...");
-		
+
 		result = false;
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
@@ -119,29 +120,30 @@ public class FullBloomFilterTest {
 						sb.setCharAt(1, (char) ("ß".codePointAt(0) + j));
 						sb.setCharAt(2, (char) ("ß".codePointAt(0) + k));
 						sb.setCharAt(3, (char) ("ß".codePointAt(0) + l));
-						String s = sb.toString();						
-						result |= gp.checkExists(s);						
+						String s = sb.toString();
+						result |= gp.checkExists(s);
 					}
-		if (result) 
+		if (result)
 			fail("There SHOULD be NO false positives in high quality filter. But that's possible...");
 	}
-	
+
 	public double round(double num, int cnt) {
 		double result = num * Math.pow(10, cnt);
 		result = Math.round(result);
 		result = result / Math.pow(10, cnt);
 		return result;
-		}
+	}
 
 	@Test
 	public void testGetQuality() {
-		if (gp.getQuality() <= 0.999) 
+		if (gp.getQuality() <= 0.999)
 			fail("Filter quality should be > 0.999");
-		
-		if (sgp.getQuality() >= 0.5) 
+
+		if (sgp.getQuality() >= 0.5)
 			fail("Filter quality should be < 0.5");
-		
-		if (round(gpp.getQuality(),5) != (1-0.00001))
-			fail("Filter quality should be = " + (1-0.00001) + ", not " +  gpp.getQuality());
+
+		if (round(gpp.getQuality(), 5) != (1 - 0.00001))
+			fail("Filter quality should be = " + (1 - 0.00001) + ", not "
+					+ gpp.getQuality());
 	}
 }
